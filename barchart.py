@@ -4,7 +4,7 @@ import logging
 import math
 
 from pathlib import Path
-from typing import Collection, Sized
+from typing import Collection, Sized, Protocol
 
 
 class Barchart:
@@ -26,9 +26,19 @@ class Barchart:
     def new_from_csv(csv_path: Path) -> "Barchart":
         pass
 
-
     @staticmethod
     def _parse_barchart_filename(csv_path: Path) -> dict:
+        """
+        Returns a dict containing information extracted from the filename of an eBird barchart csv,
+        in a form like the following:
+
+        {
+            "loc_id": ...,
+            "start_year": ...,
+            "end_year": ...,
+            "start_month": ...,
+        }
+        """
         pass
 
     @ staticmethod
