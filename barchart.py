@@ -82,6 +82,11 @@ class Barchart:
         return True
 
     @staticmethod
-    def combined_average(samp_sizes: Collection, obs:Collection) -> float:
+    def _combined_average(samp_sizes: Collection, obs:Collection) -> float:
+        return sum(obs) / sum(samp_sizes)
+
+    def summarize_period(self, start: int = 0, end: int = 47):
         pass
+
+
 
