@@ -30,11 +30,13 @@ class Barchart:
 
     @classmethod
     def new_from_csv(cls, csv_path: Path) -> "Barchart":
+        """Returns a Barchart object populated with data from an eBird CSV."""
         new_barchart = Barchart()
         new_barchart._ingest_csv_data(csv_path)
         return new_barchart
 
     def _ingest_csv_data(self, csv_path: Path) -> None:
+        """Populates instance variables with data from a csv."""
         filename_parts = self._parse_barchart_filename(csv_path)
         self.loc_id = filename_parts["loc_id"]
         self.name = ebird_interface.hotspot_name_from_loc_id(self.loc_id)
@@ -90,11 +92,20 @@ class Barchart:
             return 0.0
         return round(sum(obs) / sum(samp_sizes), 5)
 
-    def summarize_period(self, start: int = 0, end: int = 47):
-        pass
+    def build_summary_dict(self, start: int = 0, end: int = 47, include_sub_species: bool = False) -> dict:
+        """
+        Returns a dictionary of observation data summarized to a single number per species.
+        """
+        summary = {}
+        for sp, obs in self.observations.items():
+            if not(sp in self.species or include_sub_species):
+                continue
+            summary[sp] = self._combined_average(self.sample_sizes[start: end], obs[start: end])
+        return summary
+
 
     def __repr__(self) -> str:
-        return f"Barchart for {self.name}, with {len(self.species)} species."
+        return f"<Barchart for {self.name}>"
 
 
 def test():

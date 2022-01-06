@@ -13,6 +13,7 @@ def test_parse_file_name():
     assert parts["start_month"] == "1"
     assert parts["end_month"] == "12"
 
+
 def test_combined_average():
     tests = [
         (([1, 2, 3], [1, 2, 3]), 1.0),
@@ -23,6 +24,7 @@ def test_combined_average():
         data, expected = entry
         samps, obs = data
         assert Barchart._combined_average(samps, obs) == expected
+
 
 def test_clean_sp_name():
     spuh = 'goose sp. (<em class="sci">Anser/Branta sp.</em>)'
@@ -40,7 +42,6 @@ def test_clean_sp_name():
     assert Barchart.clean_sp_name(clean) == "Wood Duck"
 
 
-
 def test_is_good_species():
     spuh = "goose sp."
     domestic = "Mallard (Domestic type)"
@@ -56,4 +57,12 @@ def test_is_good_species():
     assert Barchart.is_good_species(species_1)
     assert Barchart.is_good_species(species_2)
 
-    
+
+def test_extant():
+    empty = Barchart()
+    assert empty is not None
+
+def test_from_csv():
+    # get the csv from the testing data folder
+    # make sure it exists and has correct data
+    pass
