@@ -100,7 +100,9 @@ class Barchart:
         for sp, obs in self.observations.items():
             if not(sp in self.species or include_sub_species):
                 continue
-            summary[sp] = self._combined_average(self.sample_sizes[start: end], obs[start: end])
+            av_obs = self._combined_average(self.sample_sizes[start: end], obs[start: end])
+            if av_obs:
+                summary[sp] = av_obs
         return summary
 
 
@@ -111,7 +113,7 @@ class Barchart:
 def test():
     test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
     test_bc = Barchart.new_from_csv(test_bc_path)
-    print(test_bc)
+    print(test_bc.build_summary_dict(start=14, end=18))
 
 
 if __name__ == "__main__":
