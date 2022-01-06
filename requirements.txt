@@ -3,4 +3,5 @@ isort
 mypy
 pytest
 requests
+beautifulsoup4
 json_memoize

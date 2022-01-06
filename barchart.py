@@ -2,9 +2,10 @@ import calendar
 import csv
 import logging
 import math
-
 from pathlib import Path
-from typing import Collection, Sized, Protocol
+from typing import Collection, Protocol, Sized
+
+import ebird_interface
 
 
 class Barchart:
@@ -36,17 +37,19 @@ class Barchart:
     def _ingest_csv_data(self, csv_path: Path) -> None:
         filename_parts = self._parse_barchart_filename(csv_path)
         self.loc_id = filename_parts["loc_id"]
-        self.name = filename_parts["name"]
+        self.name = ebird_interface.hotspot_name_from_loc_id(self.loc_id)
         self.start_year = filename_parts["start_year"]
         self.end_year = filename_parts["end_year"]
         self.start_month = filename_parts["start_month"]
         self.end_month = filename_parts["end_month"]
         with open(csv_path, "r") as in_file:
             data_rows = [row for row in csv.reader(in_file, dialect="excel-tab")]
-        self.sample_sizes = [int(float(s)) for s in data_rows[self.BC_FILE_SAMPLE_SIZE_ROW][1:]]
+        self.sample_sizes = [int(float(s)) for s in data_rows[self.BC_FILE_SAMPLE_SIZE_ROW][1:] if s]
         for row in data_rows[self.BC_FILE_OBS_START_ROW:]:
+            if not row:
+                continue
             sp_name = self.clean_sp_name(row[0])
-            obs_list = [int(obs * sample) for obs, sample in zip(row[1:], self.sample_sizes)]
+            obs_list = [int(float(obs) * sample) for obs, sample in zip(row[1:], self.sample_sizes)]
             self.observations[sp_name] = obs_list
         for sp in self.observations:
             if self.is_good_species(sp):
@@ -60,10 +63,10 @@ class Barchart:
         parts = csv_path.stem.split("_")
         parts_dict = {
             "loc_id": parts[1],
-            "start_year": parts[2],
-            "end_year": parts[3],
-            "start_month": parts[4],
-            "end_month": parts[5],
+            "start_year": parts[3],
+            "end_year": parts[4],
+            "start_month": parts[5],
+            "end_month": parts[6],
         }
         return parts_dict
 
@@ -83,10 +86,22 @@ class Barchart:
 
     @staticmethod
     def _combined_average(samp_sizes: Collection, obs:Collection) -> float:
-        return sum(obs) / sum(samp_sizes)
+        if sum(samp_sizes) == 0:
+            return 0.0
+        return round(sum(obs) / sum(samp_sizes), 5)
 
     def summarize_period(self, start: int = 0, end: int = 47):
         pass
 
+    def __repr__(self) -> str:
+        return f"Barchart for {self.name}, with {len(self.species)} species."
 
 
+def test():
+    test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
+    test_bc = Barchart.new_from_csv(test_bc_path)
+    print(test_bc)
+
+
+if __name__ == "__main__":
+    test()
