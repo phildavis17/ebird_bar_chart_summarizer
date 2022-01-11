@@ -105,7 +105,6 @@ class Barchart:
                 summary[sp] = av_obs
         return summary
 
-
     def __repr__(self) -> str:
         return f"<Barchart for {self.name}>"
 
