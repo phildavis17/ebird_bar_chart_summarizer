@@ -12,7 +12,6 @@ class Summary:
         self.periods: tuple = None
         self.observations: dict = None
 
-
     def simulate(self, active_hotspots: Optional[set] = None):
         pass
 
