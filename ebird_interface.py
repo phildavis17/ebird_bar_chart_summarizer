@@ -10,7 +10,10 @@ from bs4 import BeautifulSoup
 
 @memoize(app_name="ebird_barchart_summarizer")
 def hotspot_name_from_loc_id(loc_id: str) -> str:
-    """Scrapes the public eBird hotspot page for the supplied hotspot id, and returns that hotspot's name."""
+    """
+    Scrapes the public eBird hotspot page for the supplied hotspot id, and returns that hotspot's name.
+    Cached locally to avoid bugging eBird's servers too much.
+    """
     base_url = "https://ebird.org/hotspot/"
     hotspot_url = base_url + loc_id
     response = requests.get(hotspot_url).text
@@ -19,7 +22,13 @@ def hotspot_name_from_loc_id(loc_id: str) -> str:
 
 
 def test():
-    print(hotspot_name_from_loc_id("L109516"))
+    test_loc_ids = [
+        "L109516",
+        "L351189",
+        "L385839",
+    ]
+    for loc in test_loc_ids:
+        print(hotspot_name_from_loc_id(loc))
 
 if __name__ == "__main__":
     test()
