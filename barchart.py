@@ -41,7 +41,7 @@ class Barchart:
             if not row:
                 continue
             sp_name = self.clean_sp_name(row[0])
-            obs_list = [int(float(obs) * sample) for obs, sample in zip(row[1:], self.sample_sizes)]
+            obs_list = [round(float(obs) * sample) for obs, sample in zip(row[1:], self.sample_sizes)]
             self.observations[sp_name] = obs_list
         self.species: set = set()
         self.other_taxa: set = set()
@@ -85,8 +85,9 @@ class Barchart:
     def _combined_average(samp_sizes: Collection, obs: Collection) -> float:
         if len(samp_sizes) != len(obs):
             raise ValueError(f"Sample Sizes and Observation data of different lengths supplied.")
-            # ^^^ The lengths of the sample sizes and observation data should always
-            #     be the same, or else the math will seem right, but be wrong.
+            # ^^^ If the lenghts of the sample sizes and obsevations are not the same,
+            #     this method will produce an answer without complaint, but the information
+            #     will be incorrect. This error prevents that.
         if sum(samp_sizes) == 0:
             return 0.0
         return round(sum(obs) / sum(samp_sizes), 5)
@@ -130,9 +131,9 @@ def _collect_bc_files_from_folder(folder: Path) -> list:
 def test():
     test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
     test_bc = Barchart.new_from_csv(test_bc_path)
-    #print(test_bc.build_summary_dict(start=14, end=16))
-    #print(len(test_bc.observations))
-    #print(test_bc.other_taxa)
+    print(len(test_bc.other_taxa))
+    print(len(test_bc.species))
+    print(len(test_bc.observations))
 
 
 if __name__ == "__main__":

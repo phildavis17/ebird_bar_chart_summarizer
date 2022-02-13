@@ -4,16 +4,6 @@ from barchart import Barchart
 from pathlib import Path
 
 
-def test_parse_file_name():
-    fn = Path("ebird_L128138__1900_2021_1_12_barchart.txt")
-    parts = Barchart._parse_barchart_filename(fn)
-    assert parts["loc_id"] == "L128138"
-    assert parts["start_year"] == "1900"
-    assert parts["end_year"] == "2021"
-    assert parts["start_month"] == "1"
-    assert parts["end_month"] == "12"
-
-
 def test_combined_average():
     tests = [
         (([1, 2, 3], [1, 2, 3]), 1.0),
@@ -58,11 +48,55 @@ def test_is_good_species():
     assert Barchart.is_good_species(species_2)
 
 
-def test_extant():
-    empty = Barchart()
-    assert empty is not None
+@pytest.fixture
+def sample_barchart():
+    test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
+    return Barchart.new_from_csv(test_bc_path)
+    
 
-def test_from_csv():
-    # get the csv from the testing data folder
-    # make sure it exists and has correct data
-    pass
+def test_extant(sample_barchart):
+    assert sample_barchart is not None
+
+
+def test_ingest_filename(sample_barchart):
+    assert sample_barchart.loc_id == "L109516"
+    assert sample_barchart.start_year == 1900
+    assert sample_barchart.end_year == 2021
+    assert sample_barchart.start_month == 1
+    assert sample_barchart.end_month == 12
+
+
+def test_get_hotspot_name(sample_barchart):
+    assert sample_barchart.name == "Prospect Park"
+
+
+def test_ingest_file_data_coarse(sample_barchart):
+    """Tests that *some* data is present."""
+    assert sample_barchart.sample_sizes
+    assert sample_barchart.observations
+    assert sample_barchart.species
+    assert sample_barchart.other_taxa
+
+
+def test_ingest_file_data_medium(sample_barchart):
+    """Checks that data has the right shape."""
+    assert "Snow Goose" in sample_barchart.species
+    assert "Snow Goose" in sample_barchart.observations
+    assert "bird sp." in sample_barchart.other_taxa
+    assert "bird sp." in sample_barchart.observations
+    assert len(sample_barchart.sample_sizes) == 48
+    assert len(sample_barchart.observations["Snow Goose"]) == 48
+    assert len(sample_barchart.observations["bird sp."]) == 48
+    assert len(sample_barchart.species) == 288
+    assert len(sample_barchart.other_taxa) == 83
+    assert len(sample_barchart.observations) == 371
+
+def test_ingest_file_data_fine(sample_barchart):
+    """Checks that the data has correct values."""
+    assert sample_barchart.sample_sizes[0] == 601
+    assert sample_barchart.sample_sizes[47] == 363
+    assert sample_barchart.observations["Snow Goose"][0] == 32
+    assert sample_barchart.observations["Snow Goose"][47] == 35
+    assert sample_barchart.observations["bird sp."][0] == 2
+    assert sample_barchart.observations["bird sp."][47] == 1
+

@@ -13,8 +13,6 @@ class Summarizer:
             loc_ids.append(barchart.loc_id)
         loc_ids.sort()
         self.loc_ids = tuple(loc_ids)
-
-
         self.hotspot_names: tuple = self._collect_hotspot_names(self.loc_ids)
         self.species: set = None
         self.other_taxa: set = None
