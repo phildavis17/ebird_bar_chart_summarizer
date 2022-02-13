@@ -1,15 +1,11 @@
 # Structure
 
-## eBird Interface
-Interacts with the eBird website, both the public and 
-
 ## Barchart
-Ingests and stores all the information found in an eBird barchart file.
+The Barchart object stores all the information in an eBird bar chart data text file.
 
 ## Summarizer
-Holds information for a bunch of hotspots at once. Can summairze this information, and compare different compositions and settings.
+The Summarizer stores data from multiple Barcharts. 
 
-Can Produce:
- - python native data representations
- - csv files
- - json files
+## CLI
+The CLI can collect barchart files, read their filenames and contents, and use that information to instantiate Barchart objects
+
