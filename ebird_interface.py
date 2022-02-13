@@ -1,4 +1,3 @@
-import json_memoize
 from json_memoize.json_memoize import memoize
 import requests
 
