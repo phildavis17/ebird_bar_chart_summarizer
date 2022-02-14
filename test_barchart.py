@@ -155,3 +155,4 @@ def test_period_summary_complex(sample_barchart: "Barchart"):
     sp_dict = sample_barchart.build_summary_dict([46, 47, 0, 1])
     ot_dict = sample_barchart.build_summary_dict([46, 47, 0, 1], include_sub_species=True)
     assert sp_dict["Snow Goose"] == 0.05158
+    #! Something is wrong here.
