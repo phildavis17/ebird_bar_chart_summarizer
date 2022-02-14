@@ -49,7 +49,7 @@ def test_is_good_species():
 
 
 @pytest.fixture
-def sample_barchart():
+def sample_barchart() -> "Barchart":
     test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
     return Barchart.new_from_csv(test_bc_path)
     
@@ -59,7 +59,7 @@ def test_extant(sample_barchart):
     assert sample_barchart is not None
 
 
-def test_ingest_filename(sample_barchart):
+def test_ingest_filename(sample_barchart: "Barchart"):
     """Tests that information from the filename has ben properly ingested."""
     assert sample_barchart.loc_id == "L109516"
     assert sample_barchart.start_year == 1900
@@ -68,7 +68,7 @@ def test_ingest_filename(sample_barchart):
     assert sample_barchart.end_month == 12
 
 
-def test_get_hotspot_name(sample_barchart):
+def test_get_hotspot_name(sample_barchart: "Barchart"):
     """
     Tests that the hotspot's name has been properly collected.
     
@@ -79,7 +79,7 @@ def test_get_hotspot_name(sample_barchart):
     assert sample_barchart.name == "Prospect Park"
 
 
-def test_ingest_file_data_coarse(sample_barchart):
+def test_ingest_file_data_coarse(sample_barchart: "Barchart"):
     """Tests that *some* data is present."""
     assert sample_barchart.sample_sizes
     assert sample_barchart.observations
@@ -87,7 +87,7 @@ def test_ingest_file_data_coarse(sample_barchart):
     assert sample_barchart.other_taxa
 
 
-def test_ingest_file_data_medium(sample_barchart):
+def test_ingest_file_data_medium(sample_barchart: "Barchart"):
     """Checks that data has the right shape."""
     assert "Snow Goose" in sample_barchart.species
     assert "Snow Goose" in sample_barchart.observations
@@ -101,7 +101,7 @@ def test_ingest_file_data_medium(sample_barchart):
     assert len(sample_barchart.observations) == 371
 
 
-def test_ingest_file_data_fine(sample_barchart):
+def test_ingest_file_data_fine(sample_barchart: "Barchart"):
     """Checks that the data has correct values."""
     assert sample_barchart.sample_sizes[0] == 601
     assert sample_barchart.sample_sizes[47] == 363
@@ -111,19 +111,47 @@ def test_ingest_file_data_fine(sample_barchart):
     assert sample_barchart.observations["bird sp."][47] == 1
 
 
-def test_period_summary_basic(sample_barchart):
+def test_period_range(sample_barchart: "Barchart"):
+    """Tests the construction of a period range list."""
+    assert sample_barchart._build_period_range(1, 1) == [1]
+    assert sample_barchart._build_period_range(1, 2) == [1, 2]
+    assert sample_barchart._build_period_range(5, 8) == [5, 6, 7, 8]
+    assert sample_barchart._build_period_range(46, 1) == [46, 47, 0, 1]
+
+
+def test_period_summary_extant(sample_barchart: "Barchart"):
+    """Tests that some form of summary is being generated."""
+    test_dict = sample_barchart.build_summary_dict([1])
+    assert test_dict is not None
+
+
+def test_period_summary_basic(sample_barchart: "Barchart"):
     """Tests the construction of a summary dict under the simplest conditions."""
-    #TODO
-    pass
+    sp_dict = sample_barchart.build_summary_dict([0])
+    ot_dict = sample_barchart.build_summary_dict([47], include_sub_species=True)
+    assert "Summer Tanager" in sample_barchart.observations
+    assert "Snow Goose" in sp_dict
+    assert "bird sp." not in sp_dict
+    assert "Summer Tanager" not in sp_dict
+    assert sp_dict["Snow Goose"] == 0.05324
+    assert "Snow Goose" in ot_dict
+    assert "bird sp." in ot_dict
+    assert "Summer Tanager" not in ot_dict
+    assert ot_dict["Snow Goose"] == 0.09642
+    assert ot_dict["bird sp."] == 0.00275
 
 
-def test_period_summary_medium(sample_barchart):
+def test_period_summary_medium(sample_barchart: "Barchart"):
     """Tests the construction of a summary dict under slightly more complex conditions."""
-    #TODO
-    pass
+    sp_dict = sample_barchart.build_summary_dict([0, 1, 2, 3])
+    ot_dict = sample_barchart.build_summary_dict([44, 45, 46, 47], include_sub_species=True)
+    assert sp_dict["Snow Goose"] == 0.03861
+    assert ot_dict["Snow Goose"] == 0.05191
+    
 
 
-def test_period_summary_complex(sample_barchart):
+def test_period_summary_complex(sample_barchart: "Barchart"):
     """Tests the construction of a summary dict under complex conditions."""
-    #TODO
-    pass
+    sp_dict = sample_barchart.build_summary_dict([46, 47, 0, 1])
+    ot_dict = sample_barchart.build_summary_dict([46, 47, 0, 1], include_sub_species=True)
+    assert sp_dict["Snow Goose"] == 0.05158

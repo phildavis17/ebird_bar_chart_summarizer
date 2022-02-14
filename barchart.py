@@ -4,7 +4,7 @@ from fileinput import filename
 import logging
 from pathlib import Path
 from sre_constants import IN_LOC_IGNORE
-from typing import Collection, Optional
+from typing import Collection, Optional, List
 
 import ebird_interface
 
@@ -92,7 +92,7 @@ class Barchart:
             return 0.0
         return round(sum(obs) / sum(samp_sizes), 5)
 
-    def build_summary_dict(self, start: int = 0, end: int = 47, include_sub_species: bool = False) -> dict:
+    def build_summary_dict(self, period_list: List[int], include_sub_species: bool = False) -> dict:
         """
         Returns a dictionary of observation data summarized to a single number per species.
         """
@@ -100,11 +100,19 @@ class Barchart:
         for sp, obs in self.observations.items():
             if not(sp in self.species or include_sub_species):
                 continue
-            #TODO this is wrong. since periods are cyclical, end can be less than start.
-            av_obs = self._combined_average(self.sample_sizes[start: end], obs[start: end])
+            samps = [self.sample_sizes[i] for i in period_list]
+            obs_data = [obs[i] for i in period_list]
+            av_obs = self._combined_average(samps, obs_data)
             if av_obs:
                 summary[sp] = av_obs
         return summary
+    
+    @staticmethod
+    def _build_period_range(start: int, end: int):
+        if end < start:
+            end += 48
+        return [i % 48 for i in range(start, end + 1)]
+        
 
     def __repr__(self) -> str:
         return f"<Barchart for {self.name}>"
@@ -133,9 +141,7 @@ class CLIControler:
 def test():
     test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
     test_bc = Barchart.new_from_csv(test_bc_path)
-    print(len(test_bc.other_taxa))
-    print(len(test_bc.species))
-    print(len(test_bc.observations))
+    print(test_bc.build_period_range(46, 1))
 
 
 if __name__ == "__main__":
