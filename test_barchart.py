@@ -55,10 +55,12 @@ def sample_barchart():
     
 
 def test_extant(sample_barchart):
+    """Tests that a barchart object has actually been created."""
     assert sample_barchart is not None
 
 
 def test_ingest_filename(sample_barchart):
+    """Tests that information from the filename has ben properly ingested."""
     assert sample_barchart.loc_id == "L109516"
     assert sample_barchart.start_year == 1900
     assert sample_barchart.end_year == 2021
@@ -67,6 +69,13 @@ def test_ingest_filename(sample_barchart):
 
 
 def test_get_hotspot_name(sample_barchart):
+    """
+    Tests that the hotspot's name has been properly collected.
+    
+    NOTE: the method that does this is cached, so this either
+    tests that the cache is working, or it will ping eBird,
+    which will be painfully slow.
+    """
     assert sample_barchart.name == "Prospect Park"
 
 
@@ -91,6 +100,7 @@ def test_ingest_file_data_medium(sample_barchart):
     assert len(sample_barchart.other_taxa) == 83
     assert len(sample_barchart.observations) == 371
 
+
 def test_ingest_file_data_fine(sample_barchart):
     """Checks that the data has correct values."""
     assert sample_barchart.sample_sizes[0] == 601
@@ -100,3 +110,20 @@ def test_ingest_file_data_fine(sample_barchart):
     assert sample_barchart.observations["bird sp."][0] == 2
     assert sample_barchart.observations["bird sp."][47] == 1
 
+
+def test_period_summary_basic(sample_barchart):
+    """Tests the construction of a summary dict under the simplest conditions."""
+    #TODO
+    pass
+
+
+def test_period_summary_medium(sample_barchart):
+    """Tests the construction of a summary dict under slightly more complex conditions."""
+    #TODO
+    pass
+
+
+def test_period_summary_complex(sample_barchart):
+    """Tests the construction of a summary dict under complex conditions."""
+    #TODO
+    pass

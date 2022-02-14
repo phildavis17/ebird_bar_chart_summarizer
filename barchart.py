@@ -100,6 +100,7 @@ class Barchart:
         for sp, obs in self.observations.items():
             if not(sp in self.species or include_sub_species):
                 continue
+            #TODO this is wrong. since periods are cyclical, end can be less than start.
             av_obs = self._combined_average(self.sample_sizes[start: end], obs[start: end])
             if av_obs:
                 summary[sp] = av_obs
@@ -117,15 +118,16 @@ class Summarizer:
     def build_summary_dict(self, start: int = 0, end: int = 47, include_sub_species: bool = False) -> dict:
         pass
 
+    def build_master_dict(self) -> dict:
+        pass
 
+    @classmethod
+    def new_from_barcharts(cls, barcharts: list) -> "Summarizer":
+        pass
 
-def summarize(bc_files: list) -> None:
-    pass
-
-
-def _collect_bc_files_from_folder(folder: Path) -> list:
-    #TODO: "ebird_..._barchart.txt"
-    pass
+class CLIControler:
+    def __init__(self) -> None:
+        pass
 
 
 def test():
