@@ -1,6 +1,6 @@
 import pytest
 
-from summary import Summarizer
+from app.summary import Summarizer
 
 @pytest.mark.skip(reason="Not implimented.")
 def test_extant():

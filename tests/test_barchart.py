@@ -1,6 +1,6 @@
 import pytest
 
-from barchart import Barchart
+from app.barchart import Barchart
 from pathlib import Path
 
 
@@ -50,7 +50,7 @@ def test_is_good_species():
 
 @pytest.fixture
 def sample_barchart() -> "Barchart":
-    test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
+    test_bc_path = Path(__file__).parent / "test_data" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
     return Barchart.new_from_csv(test_bc_path)
     
 
@@ -154,5 +154,8 @@ def test_period_summary_complex(sample_barchart: "Barchart"):
     """Tests the construction of a summary dict under complex conditions."""
     sp_dict = sample_barchart.build_summary_dict([46, 47, 0, 1])
     ot_dict = sample_barchart.build_summary_dict([46, 47, 0, 1], include_sub_species=True)
-    assert sp_dict["Snow Goose"] == 0.05158
-    #! Something is wrong here.
+    assert "Dickcissel" in sample_barchart.observations
+    assert "Dickcissel" not in sp_dict
+    assert "Dickcissel" not in ot_dict
+    assert sp_dict["Snow Goose"] == 0.06125
+    assert ot_dict["bird sp."] == 0.00193

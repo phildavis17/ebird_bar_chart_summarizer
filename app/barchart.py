@@ -112,25 +112,28 @@ class Barchart:
         if end < start:
             end += 48
         return [i % 48 for i in range(start, end + 1)]
-        
-
+    
     def __repr__(self) -> str:
         return f"<Barchart for {self.name}>"
 
 
 class Summarizer:
     
-    def __init__(self, barcharts: list) -> None:
-        pass
+    def __init__(self, barcharts: List["Barchart"], name: Optional[str] = None) -> None:
+        self.name = name
+        self.loc_ids = tuple(sorted([bc.loc_id for bc in barcharts]))
+        name_dict = {bc.loc_id: bc.name for bc in barcharts}
+        self.hotspot_names = tuple([name_dict[loc_id] for loc_id in self.loc_ids])
 
-    def build_summary_dict(self, start: int = 0, end: int = 47, include_sub_species: bool = False) -> dict:
+
+    def summarize_periods(self, periods: List[int], include_sub_species: bool = False) -> dict:
         pass
 
     def build_master_dict(self) -> dict:
         pass
 
     @classmethod
-    def new_from_barcharts(cls, barcharts: list) -> "Summarizer":
+    def new_from_barcharts(cls, barcharts: List["Barchart"]) -> "Summarizer":
         pass
 
 class CLIControler:
@@ -141,7 +144,7 @@ class CLIControler:
 def test():
     test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
     test_bc = Barchart.new_from_csv(test_bc_path)
-    print(test_bc.build_period_range(46, 1))
+    
 
 
 if __name__ == "__main__":
