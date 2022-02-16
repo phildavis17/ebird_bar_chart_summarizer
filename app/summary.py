@@ -1,6 +1,6 @@
 from typing import Optional
 
-import ebird_interface
+import app.ebird_interface as ebird_interface
 
 class Summarizer:
     """

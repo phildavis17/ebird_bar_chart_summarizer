@@ -1,12 +1,10 @@
 import calendar
 import csv
-from fileinput import filename
 import logging
 from pathlib import Path
-from sre_constants import IN_LOC_IGNORE
 from typing import Collection, Optional, List
 
-import ebird_interface
+import app.ebird_interface as ebird_interface
 
 
 class Barchart:
