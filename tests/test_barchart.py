@@ -210,4 +210,3 @@ def test_summarizer_data_values(sample_summarizer: "Summarizer"):
     assert sample_summarizer.hotspot_names["L109516"] == "Prospect Park"
     assert sample_summarizer.hotspot_names["L385839"] == "Salt Marsh Nature Center at Marine Park"
 
-

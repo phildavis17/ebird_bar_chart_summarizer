@@ -21,6 +21,7 @@ class Barchart:
         self._ingest_filename(filename)
         self._ingest_csv_data(file_text)
         self.name = ebird_interface.hotspot_name_from_loc_id(self.loc_id)
+        logging.info("Barchart created for %s" % self.name)
 
     def _ingest_filename(self, filename: str) -> None:
         """Populates instance variables with information from an eBird barchart file's filename."""
