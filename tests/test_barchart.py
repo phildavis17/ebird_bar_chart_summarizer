@@ -1,7 +1,8 @@
 import pytest
 
-from app.barchart import Barchart
+from app.barchart import Barchart, Summarizer
 from pathlib import Path
+from typing import List
 
 
 def test_combined_average():
@@ -52,6 +53,15 @@ def test_is_good_species():
 def sample_barchart() -> "Barchart":
     test_bc_path = Path(__file__).parent / "test_data" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
     return Barchart.new_from_csv(test_bc_path)
+
+
+@pytest.fixture
+def sample_summarizer() -> "Summarizer":
+    pp_bc_path = Path(__file__).parent / "test_data" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
+    cv_bc_path = Path(__file__).parent / "test_data" / "ebird_L351189__1900_2021_1_12_barchart.txt/"
+    mp_bc_path = Path(__file__).parent / "test_data" / "ebird_L385839__1900_2021_1_12_barchart.txt/"
+    bc_list = [pp_bc_path, cv_bc_path, mp_bc_path]
+    return Summarizer([Barchart.new_from_csv(bc_file) for bc_file in bc_list], name = "Sample Summarizer")
     
 
 def test_extant(sample_barchart):
@@ -147,7 +157,6 @@ def test_period_summary_medium(sample_barchart: "Barchart"):
     ot_dict = sample_barchart.build_summary_dict([44, 45, 46, 47], include_sub_species=True)
     assert sp_dict["Snow Goose"] == 0.03861
     assert ot_dict["Snow Goose"] == 0.05191
-    
 
 
 def test_period_summary_complex(sample_barchart: "Barchart"):
@@ -159,3 +168,37 @@ def test_period_summary_complex(sample_barchart: "Barchart"):
     assert "Dickcissel" not in ot_dict
     assert sp_dict["Snow Goose"] == 0.06125
     assert ot_dict["bird sp."] == 0.00193
+
+
+def test_summarizer_extant(sample_summarizer: "Summarizer"):
+    assert sample_summarizer is not None
+
+
+def test_summarizer_data_extant(sample_summarizer: "Summarizer"):
+    assert sample_summarizer.name
+    assert sample_summarizer.loc_ids
+    assert sample_summarizer.hotspot_names
+    assert sample_summarizer.active_hotspots
+    assert sample_summarizer.total_sample_sizes
+    assert sample_summarizer.total_obs_data
+    assert sample_summarizer.total_species
+    assert sample_summarizer.total_other_taxa
+
+
+def test_summarizer_data_shape(sample_summarizer: "Summarizer"):
+    assert len(sample_summarizer.loc_ids) == 3
+    assert len(sample_summarizer) == 3
+    assert len(sample_summarizer.hotspot_names) == 3
+    assert len(sample_summarizer.active_hotspots) == 3
+    assert len(sample_summarizer.total_sample_sizes) == 3
+    assert len(sample_summarizer.total_obs_data) == 3
+    assert len(sample_summarizer.total_species) == 312
+    assert len(sample_summarizer.total_other_taxa) == 93
+
+
+def test_summarizer_data_values(sample_summarizer: "Summarizer"):
+    assert sample_summarizer.name == "Sample Summarizer"
+    assert "Prospect Park" in sample_summarizer.hotspot_names.values()
+    assert "Salt Marsh Nature Center at Marine Park" in sample_summarizer.hotspot_names.values()
+    assert sample_summarizer.hotspot_names["L109516"] == "Prospect Park"
+    assert sample_summarizer.hotspot_names["L385839"] == "Salt Marsh Nature Center at Marine Park"

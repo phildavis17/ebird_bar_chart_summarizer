@@ -120,23 +120,47 @@ class Summarizer:
     def __init__(self, barcharts: List["Barchart"], name: Optional[str] = None) -> None:
         self.name = name
         self.loc_ids = tuple(sorted([bc.loc_id for bc in barcharts]))
-        name_dict = {bc.loc_id: bc.name for bc in barcharts}
-        self.hotspot_names = tuple([name_dict[loc_id] for loc_id in self.loc_ids])
+        self.hotspot_names = {bc.loc_id: bc.name for bc in barcharts}
+        self.active_hotspots = {loc_id for loc_id in self.loc_ids}
+        self.total_sample_sizes = {bc.loc_id: bc.sample_sizes for bc in barcharts}
+        self.total_obs_data = {bc.loc_id: bc.observations for bc in barcharts}
+        self.total_species = set().union(*[bc.species for bc in barcharts])
+        self.total_other_taxa = set().union(*[bc.other_taxa for bc in barcharts])
 
+    @staticmethod
+    def _combined_average(samp_sizes: Collection, obs: Collection) -> float:
+        if len(samp_sizes) != len(obs):
+            raise ValueError(f"Sample Sizes and Observation data of different lengths supplied.")
+            # ^^^ If the lenghts of the sample sizes and obsevations are not the same,
+            #     this method will produce an answer without complaint, but the information
+            #     will be incorrect. This error prevents that.
+        if sum(samp_sizes) == 0:
+            return 0.0
+        return round(sum(obs) / sum(samp_sizes), 5)
 
-    def summarize_periods(self, periods: List[int], include_sub_species: bool = False) -> dict:
-        pass
-
-    def build_master_dict(self) -> dict:
-        pass
-
-    @classmethod
-    def new_from_barcharts(cls, barcharts: List["Barchart"]) -> "Summarizer":
-        pass
-
-class CLIControler:
-    def __init__(self) -> None:
-        pass
+    def build_summary_dict(self, period_list: List[int], include_sub_species: bool = False) -> dict:
+        """
+        Returns a dictionary of observation data summarized to a single number per species.
+        """
+        summary = {}
+        for sp, obs in self.total_obs_data.items():
+            if not(sp in self.total_species or include_sub_species):
+                continue
+            samps = [self.total_sample_sizes[i] for i in period_list]
+            obs_data = [obs[i] for i in period_list]
+            av_obs = self._combined_average(samps, obs_data)
+            if av_obs:
+                summary[sp] = av_obs
+        return summary
+    
+    @staticmethod
+    def _build_period_range(start: int, end: int):
+        if end < start:
+            end += 48
+        return [i % 48 for i in range(start, end + 1)]
+    
+    def __len__(self):
+        return len(self.loc_ids)
 
 
 def test():
