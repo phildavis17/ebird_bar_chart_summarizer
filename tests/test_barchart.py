@@ -103,12 +103,16 @@ def test_ingest_file_data_medium(sample_barchart: "Barchart"):
     assert "Snow Goose" in sample_barchart.observations
     assert "bird sp." in sample_barchart.other_taxa
     assert "bird sp." in sample_barchart.observations
+    assert "Fake Bird" not in sample_barchart.species
+    assert "Fake Bird" not in sample_barchart.other_taxa
     assert len(sample_barchart.sample_sizes) == 48
-    assert len(sample_barchart.observations["Snow Goose"]) == 48
-    assert len(sample_barchart.observations["bird sp."]) == 48
     assert len(sample_barchart.species) == 288
     assert len(sample_barchart.other_taxa) == 83
     assert len(sample_barchart.observations) == 371
+    assert len(sample_barchart.observations["Snow Goose"]) == 48
+    assert len(sample_barchart.observations["bird sp."]) == 48
+    assert len(sample_barchart.observations["Fake Bird"]) == 48
+    
 
 
 def test_ingest_file_data_fine(sample_barchart: "Barchart"):
@@ -119,6 +123,9 @@ def test_ingest_file_data_fine(sample_barchart: "Barchart"):
     assert sample_barchart.observations["Snow Goose"][47] == 35
     assert sample_barchart.observations["bird sp."][0] == 2
     assert sample_barchart.observations["bird sp."][47] == 1
+    assert sample_barchart.observations["Fake Bird"][0] == 0
+    assert sample_barchart.observations["Fake Bird"][47] == 0
+
 
 
 def test_period_range(sample_barchart: "Barchart"):
@@ -202,3 +209,5 @@ def test_summarizer_data_values(sample_summarizer: "Summarizer"):
     assert "Salt Marsh Nature Center at Marine Park" in sample_summarizer.hotspot_names.values()
     assert sample_summarizer.hotspot_names["L109516"] == "Prospect Park"
     assert sample_summarizer.hotspot_names["L385839"] == "Salt Marsh Nature Center at Marine Park"
+
+

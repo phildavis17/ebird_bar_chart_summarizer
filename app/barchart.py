@@ -1,6 +1,7 @@
 import calendar
 import csv
 import logging
+from collections import defaultdict
 from pathlib import Path
 from typing import Collection, Optional, List
 
@@ -29,12 +30,17 @@ class Barchart:
         self.end_year: int = int(parts[4])
         self.start_month: int = int(parts[5])
         self.end_month: int = int(parts[6])
+
+    @staticmethod
+    def _get_blank_row() -> List[int]:
+        """Returns a list of 48 zeros. Used as the default for the observation defaultdict"""
+        return [0] * 48
     
     def _ingest_csv_data(self, csv_data_string: str) -> None:
         """Populates instance variables with information from an eBird barchart file."""
         data_rows = [row for row in csv.reader(csv_data_string.splitlines(), dialect="excel-tab")]
         self.sample_sizes: list = [int(float(s)) for s in data_rows[self.BC_FILE_SAMPLE_SIZE_ROW][1:] if s]
-        self.observations: dict = {}
+        self.observations: defaultdict = defaultdict(self._get_blank_row)
         for row in data_rows[self.BC_FILE_OBS_START_ROW:]:
             if not row:
                 continue
@@ -116,7 +122,6 @@ class Barchart:
 
 
 class Summarizer:
-    
     def __init__(self, barcharts: List["Barchart"], name: Optional[str] = None) -> None:
         self.name = name
         self.loc_ids = tuple(sorted([bc.loc_id for bc in barcharts]))
