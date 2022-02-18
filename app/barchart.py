@@ -183,6 +183,9 @@ class Summarizer:
         if loc_id not in self.loc_ids:
             raise ValueError(f"Unrecognized hotspot loc_id: {loc_id}")            
         self.active_hotspots.add(loc_id)
+    
+    def find_current_specialties(self, include_sub_species: bool = False) -> dict:
+        pass
 
     def __len__(self):
         return len(self.loc_ids)
