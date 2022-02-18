@@ -210,3 +210,22 @@ def test_summarizer_data_values(sample_summarizer: "Summarizer"):
     assert sample_summarizer.hotspot_names["L109516"] == "Prospect Park"
     assert sample_summarizer.hotspot_names["L385839"] == "Salt Marsh Nature Center at Marine Park"
 
+
+def test_summarizer_hotspot_activation(sample_summarizer: "Summarizer"):
+    assert "L109516" in sample_summarizer.active_hotspots
+    sample_summarizer.set_hotspot_inactive("L109516")
+    assert "L109516" not in sample_summarizer.active_hotspots
+    sample_summarizer.set_hotspot_active("L109516")
+    assert "L109516" in sample_summarizer.active_hotspots
+    with pytest.raises(ValueError):
+        sample_summarizer.set_hotspot_active("Bad Hotspot")
+    with pytest.raises(ValueError):
+        sample_summarizer.set_hotspot_inactive("Bad Hotspot")
+
+
+def test_summarizer_active_species_and_other_taxa(sample_summarizer: "Summarizer"):
+    pp_only_species = "Swainson's Warbler"
+    pp_only_ot = ""
+    assert pp_only_species in sample_summarizer.active_species
+    sample_summarizer.set_hotspot_inactive("L109516")
+    assert pp_only_species not in sample_summarizer.active_species

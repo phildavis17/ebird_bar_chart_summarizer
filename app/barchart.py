@@ -1,11 +1,10 @@
-import calendar
 import csv
 import logging
 from collections import defaultdict
 from pathlib import Path
 from typing import Collection, Optional, List
 
-import app.ebird_interface as ebird_interface
+from app import ebird_interface
 
 
 class Barchart:
@@ -127,12 +126,12 @@ class Summarizer:
         self.name = name
         self.loc_ids = tuple(sorted([bc.loc_id for bc in barcharts]))
         self.hotspot_names = {bc.loc_id: bc.name for bc in barcharts}
-        self.active_hotspots = {loc_id for loc_id in self.loc_ids}
+        self.active_hotspots = set(self.loc_ids)
         self.total_sample_sizes = {bc.loc_id: bc.sample_sizes for bc in barcharts}
         self.total_obs_data = {bc.loc_id: bc.observations for bc in barcharts}
         self.total_species = set().union(*[bc.species for bc in barcharts])
         self.total_other_taxa = set().union(*[bc.other_taxa for bc in barcharts])
-
+    
     @staticmethod
     def _combined_average(samp_sizes: Collection, obs: Collection) -> float:
         if len(samp_sizes) != len(obs):
@@ -165,6 +164,26 @@ class Summarizer:
             end += 48
         return [i % 48 for i in range(start, end + 1)]
     
+    @property
+    def active_species(self) -> set:
+        return {sp for hs in self.active_hotspots for sp in self.total_obs_data[hs] if sp in self.total_species}
+
+    @property
+    def active_other_taxa(self) -> set:
+        return {sp for hs in self.active_hotspots for sp in self.total_obs_data[hs] if sp in self.total_other_taxa}
+
+    def set_hotspot_inactive(self, loc_id: str) -> None:
+        """Removes the supplied loc_id from the list of active hotspots."""
+        if loc_id not in self.loc_ids:
+            raise ValueError(f"Unrecognized hotspot loc_id: {loc_id}")
+        self.active_hotspots.discard(loc_id)
+
+    def set_hotspot_active(self, loc_id: str) -> None:
+        """Adds the supplied loc_id from the list of active hotspots."""
+        if loc_id not in self.loc_ids:
+            raise ValueError(f"Unrecognized hotspot loc_id: {loc_id}")            
+        self.active_hotspots.add(loc_id)
+
     def __len__(self):
         return len(self.loc_ids)
 
