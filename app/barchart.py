@@ -160,6 +160,7 @@ class Summarizer:
     
     @staticmethod
     def _build_period_range(start: int, end: int):
+        """Takes a start and end period, and creates a list of integers included in that range. Range includes bounds."""
         if end < start:
             end += 48
         return [i % 48 for i in range(start, end + 1)]
@@ -183,6 +184,27 @@ class Summarizer:
         if loc_id not in self.loc_ids:
             raise ValueError(f"Unrecognized hotspot loc_id: {loc_id}")            
         self.active_hotspots.add(loc_id)
+
+    def summarize_period_total(self, periods: List[int], include_sub_species: bool = False) -> dict:
+        """Returns a dict of observation data reduced to a single number per species for each hotspot."""
+        sample_sizes = {}
+        observations = {}
+        for hs, obs_dict in self.total_obs_data.items():
+            sample_sizes[hs] = sum([self.total_sample_sizes[hs][period] for period in periods])
+            observations[hs] = sum([self.total_obs_data[hs][period] for period in periods])
+        return {"samples": sample_sizes, "observations": observations}
+
+    def _summarize_samples(self, periods: List[int]) -> dict:
+        """Returns a dict of cumulative sample sizes for each hotspot for the specified periods."""
+        return {hs: sum([samps[p] for p in periods]) for hs, samps in self.total_sample_sizes.items()}
+    
+    def _summarize_observations(self, periods: List[int]) -> dict:
+        """Returns a dict of cumulative observations for each taxa for each hotspot for the specified periods."""
+        summary_obs = {}
+        for hs, obs_dict in self.total_obs_data.items():
+            summary_obs[hs] = {sp: sum([obs[p] for p in periods]) for sp, obs in obs_dict.items()}
+        return summary_obs
+
     
     def find_current_specialties(self, include_sub_species: bool = False) -> dict:
         pass
