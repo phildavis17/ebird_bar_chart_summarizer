@@ -1,1 +1,1 @@
-"""eBird Barchart Summarizer"""
+"""eBird Bar Chart Tools"""

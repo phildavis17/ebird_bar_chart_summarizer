@@ -1,1 +1,1 @@
-"""Test suite"""
+"""Tests for eBird Bar Chart Tools."""

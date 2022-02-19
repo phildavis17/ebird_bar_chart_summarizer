@@ -100,7 +100,9 @@ def test_ingest_file_data_coarse(sample_barchart: "Barchart"):
 def test_ingest_file_data_medium(sample_barchart: "Barchart"):
     """Checks that data has the right shape."""
     assert "Snow Goose" in sample_barchart.species
+    assert "Snow Goose" not in sample_barchart.other_taxa
     assert "Snow Goose" in sample_barchart.observations
+    assert "bird sp." not in sample_barchart.species
     assert "bird sp." in sample_barchart.other_taxa
     assert "bird sp." in sample_barchart.observations
     assert "Fake Bird" not in sample_barchart.species
