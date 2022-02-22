@@ -1,3 +1,4 @@
+from re import S
 import pytest
 
 from app.barchart import Barchart, Summarizer
@@ -231,3 +232,14 @@ def test_summarizer_active_species_and_other_taxa(sample_summarizer: "Summarizer
     assert pp_only_species in sample_summarizer.active_species
     sample_summarizer.set_hotspot_inactive("L109516")
     assert pp_only_species not in sample_summarizer.active_species
+
+
+def test_overall_odds_simple(sample_summarizer: "Summarizer"):
+    assert sample_summarizer._overall_odds([0.5, 0.5]) == 0.75
+    assert sample_summarizer._overall_odds([0.5]) == 0.5
+    assert sample_summarizer._overall_odds([0, 0, 0, 0]) == 0
+    assert sample_summarizer._overall_odds([1, 1]) == 1
+    assert sample_summarizer._overall_odds([0, 1]) == 1
+
+
+

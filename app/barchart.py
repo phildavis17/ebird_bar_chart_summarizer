@@ -204,6 +204,18 @@ class Summarizer:
         for hs, obs_dict in self.total_obs_data.items():
             summary_obs[hs] = {sp: sum([obs[p] for p in periods]) for sp, obs in obs_dict.items()}
         return summary_obs
+    
+    @staticmethod
+    def _overall_odds(odds_list: list) -> float:
+        """Given a list of probabilities, returns the odds that at least one of them will succeed."""
+        if not odds_list:
+            raise ValueError("No odds values in list.")
+        inverse_overall = 1
+        for odds in odds_list:
+            if not 0 <= odds <= 1:
+                raise ValueError(f"Improper probablility: {odds}")
+            inverse_overall *= 1 - odds
+        return 1 - inverse_overall
 
     
     def find_current_specialties(self, include_sub_species: bool = False) -> dict:
