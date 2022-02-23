@@ -242,4 +242,27 @@ def test_overall_odds_simple(sample_summarizer: "Summarizer"):
     assert sample_summarizer._overall_odds([0, 1]) == 1
 
 
+def test_summary_dict_whole_year(sample_summarizer: "Summarizer"):
+    whole_year = sample_summarizer.build_summary_dict(list(range(48)), True)
+    assert whole_year["L109516"]["Snow Goose"] == 0.02331
+    assert whole_year["L351189"]["Snow Goose"] == 0.01102
+    assert whole_year["L385839"]["Snow Goose"] == 0.02163
+    assert whole_year["L109516"]["Magnolia Warbler"] == 0.19184
+    assert whole_year["L351189"]["Magnolia Warbler"] == 0.08875
+    assert whole_year["L385839"]["Magnolia Warbler"] == 0.02338
+    assert whole_year["L109516"]["Northern Cardinal"] == 0.77615
+    assert whole_year["L351189"]["Northern Cardinal"] == 0.58411
+    assert whole_year["L385839"]["Northern Cardinal"] == 0.50819
 
+def test_summary_dict_migration(sample_summarizer: "Summarizer"):
+    migration = sample_summarizer.build_summary_dict(list(range(12, 20)), True)
+    assert migration["L109516"]["Snow Goose"] == 0.02864
+    assert migration["L351189"]["Snow Goose"] == 0.0
+    assert migration["L385839"]["Snow Goose"] == 0.0
+    assert migration["L109516"]["Magnolia Warbler"] == 0.27999
+    assert migration["L351189"]["Magnolia Warbler"] == 0.16967
+    assert migration["L385839"]["Magnolia Warbler"] == 0.04487
+    assert migration["L109516"]["Northern Cardinal"] == 0.83663
+    assert migration["L351189"]["Northern Cardinal"] == 0.64010
+    assert migration["L385839"]["Northern Cardinal"] == 0.66500
+    

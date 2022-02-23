@@ -7,6 +7,10 @@ from typing import Collection, Optional, List
 from app import ebird_interface
 
 
+# Utility Functions
+
+
+
 class Barchart:
     """
     A class for storing and manipulating data from eBird Bar Chart Data csv files.
@@ -147,17 +151,17 @@ class Summarizer:
         """
         Returns a dictionary of observation data summarized to a single number per species.
         """
-        summary = {}
-        for sp, obs in self.total_obs_data.items():
-            if not(sp in self.total_species or include_sub_species):
-                continue
-            samps = [self.total_sample_sizes[i] for i in period_list]
-            obs_data = [obs[i] for i in period_list]
-            av_obs = self._combined_average(samps, obs_data)
-            if av_obs:
-                summary[sp] = av_obs
-        return summary
-    
+        summary_dict = {}
+        for hs, obs_dict in self.total_obs_data.items():
+            hs_summary = defaultdict(float)
+            samples = [self.total_sample_sizes[hs][p] for p in period_list]
+            for sp, obs_list in obs_dict.items():
+                obs = [obs_list[p] for p in period_list]
+                hs_summary[sp] = self._combined_average(samples, obs)
+            summary_dict[hs] = hs_summary
+        return summary_dict
+
+
     @staticmethod
     def _build_period_range(start: int, end: int):
         """Takes a start and end period, and creates a list of integers included in that range. Range includes bounds."""
@@ -223,6 +227,12 @@ class Summarizer:
 
     def __len__(self):
         return len(self.loc_ids)
+    
+
+    ###### WHAT THE HELL IS THIS THING DOING ######
+    # it needs to report:
+    # - 
+    # - 
 
 
 def test():
