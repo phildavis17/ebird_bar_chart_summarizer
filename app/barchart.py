@@ -153,6 +153,8 @@ class Summarizer:
         """
         summary_dict = {}
         for hs, obs_dict in self.total_obs_data.items():
+            if hs not in self.active_hotspots:
+                continue
             hs_summary = defaultdict(float)
             samples = [self.total_sample_sizes[hs][p] for p in period_list]
             for sp, obs_list in obs_dict.items():
@@ -219,8 +221,7 @@ class Summarizer:
             if not 0 <= odds <= 1:
                 raise ValueError(f"Improper probablility: {odds}")
             inverse_overall *= 1 - odds
-        return 1 - inverse_overall
-
+        return round(1 - inverse_overall, 5)
     
     def find_current_specialties(self, include_sub_species: bool = False) -> dict:
         pass
