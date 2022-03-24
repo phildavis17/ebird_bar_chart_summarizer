@@ -62,7 +62,7 @@ def sample_summarizer() -> "Summarizer":
     mp_bc_path = Path(__file__).parent / "test_data" / "ebird_L385839__1900_2021_1_12_barchart.txt/"
     bc_list = [pp_bc_path, cv_bc_path, mp_bc_path]
     return Summarizer([Barchart.new_from_csv(bc_file) for bc_file in bc_list], name = "Sample Summarizer")
-    
+
 
 def test_extant(sample_barchart):
     """Tests that a barchart object has actually been created."""
@@ -81,7 +81,7 @@ def test_ingest_filename(sample_barchart: "Barchart"):
 def test_get_hotspot_name(sample_barchart: "Barchart"):
     """
     Tests that the hotspot's name has been properly collected.
-    
+
     NOTE: the method that does this is cached, so this either
     tests that the cache is working, or it will ping eBird,
     which will be painfully slow.
@@ -114,7 +114,7 @@ def test_ingest_file_data_medium(sample_barchart: "Barchart"):
     assert len(sample_barchart.observations["Snow Goose"]) == 48
     assert len(sample_barchart.observations["bird sp."]) == 48
     assert len(sample_barchart.observations["Fake Bird"]) == 48
-    
+
 
 def test_ingest_file_data_fine(sample_barchart: "Barchart"):
     """Checks that the data has correct values."""

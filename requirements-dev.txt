@@ -1,8 +1,9 @@
+beautifulsoup4
 black
 isort
-mypy
-pytest
-requests
-beautifulsoup4
 json_memoize
+mypy
+pre-commit
+pytest
 pyyaml
+requests

@@ -14,7 +14,7 @@ from app import ebird_interface
 class Barchart:
     """
     A class for storing and manipulating data from eBird Bar Chart Data csv files.
-    
+
     Stores all the data that can be extracted from an eBird Bar Chart file.
     """
     BC_FILE_SAMPLE_SIZE_ROW = 14
@@ -39,7 +39,7 @@ class Barchart:
     def _get_blank_row() -> List[int]:
         """Returns a list of 48 zeros. Used as the default for the observation defaultdict"""
         return [0] * 48
-    
+
     def _ingest_csv_data(self, csv_data_string: str) -> None:
         """Populates instance variables with information from an eBird barchart file."""
         data_rows = [row for row in csv.reader(csv_data_string.splitlines(), dialect="excel-tab")]
@@ -58,7 +58,7 @@ class Barchart:
                 self.species.add(sp)
             else:
                 self.other_taxa.add(sp)
-    
+
     @classmethod
     def new_from_csv(cls, csv_path: Path) -> "Barchart":
         """Returns a Barchart object populated with data from an eBird CSV."""
@@ -66,12 +66,12 @@ class Barchart:
         with open(csv_path, "r") as in_file:
             file_text = in_file.read()
         return Barchart(filename, file_text)
-        
+
     @ staticmethod
     def clean_sp_name(sp_name: str) -> str:
         """Returns a species name stripped of html information, if present."""
         return sp_name.partition(" (<")[0]
-    
+
     @staticmethod
     def is_good_species(sp_name: str) -> bool:
         """Returns True if the supplied species name contains substrings that indicate it is a sub-species level taxon."""
@@ -80,7 +80,7 @@ class Barchart:
             if flag.lower() in sp_name.lower():
                 return False
         return True
-    
+
     @property
     def species_observations(self) -> dict:
         return {sp: self.observations[sp] for sp in self.species}
@@ -114,13 +114,13 @@ class Barchart:
             if av_obs:
                 summary[sp] = av_obs
         return summary
-    
+
     @staticmethod
     def _build_period_range(start: int, end: int):
         if end < start:
             end += 48
         return [i % 48 for i in range(start, end + 1)]
-    
+
     def __repr__(self) -> str:
         return f"<Barchart for {self.name}>"
 
@@ -135,7 +135,7 @@ class Summarizer:
         self.total_obs_data = {bc.loc_id: bc.observations for bc in barcharts}
         self.total_species = set().union(*[bc.species for bc in barcharts])
         self.total_other_taxa = set().union(*[bc.other_taxa for bc in barcharts])
-    
+
     @staticmethod
     def _combined_average(samp_sizes: Collection, obs: Collection) -> float:
         if len(samp_sizes) != len(obs):
@@ -170,7 +170,7 @@ class Summarizer:
         if end < start:
             end += 48
         return [i % 48 for i in range(start, end + 1)]
-    
+
     @property
     def active_species(self) -> set:
         return {sp for hs in self.active_hotspots for sp in self.total_obs_data[hs] if sp in self.total_species}
@@ -188,7 +188,7 @@ class Summarizer:
     def set_hotspot_active(self, loc_id: str) -> None:
         """Adds the supplied loc_id from the list of active hotspots."""
         if loc_id not in self.loc_ids:
-            raise ValueError(f"Unrecognized hotspot loc_id: {loc_id}")            
+            raise ValueError(f"Unrecognized hotspot loc_id: {loc_id}")
         self.active_hotspots.add(loc_id)
 
     def summarize_period_total(self, periods: List[int], include_sub_species: bool = False) -> dict:
@@ -203,14 +203,14 @@ class Summarizer:
     def _summarize_samples(self, periods: List[int]) -> dict:
         """Returns a dict of cumulative sample sizes for each hotspot for the specified periods."""
         return {hs: sum([samps[p] for p in periods]) for hs, samps in self.total_sample_sizes.items()}
-    
+
     def _summarize_observations(self, periods: List[int]) -> dict:
         """Returns a dict of cumulative observations for each taxa for each hotspot for the specified periods."""
         summary_obs = {}
         for hs, obs_dict in self.total_obs_data.items():
             summary_obs[hs] = {sp: sum([obs[p] for p in periods]) for sp, obs in obs_dict.items()}
         return summary_obs
-    
+
     @staticmethod
     def _overall_odds(odds_list: list) -> float:
         """Given a list of probabilities, returns the odds that at least one of them will succeed."""
@@ -222,24 +222,24 @@ class Summarizer:
                 raise ValueError(f"Improper probablility: {odds}")
             inverse_overall *= 1 - odds
         return round(1 - inverse_overall, 5)
-    
+
     def find_current_specialties(self, include_sub_species: bool = False) -> dict:
         pass
 
     def __len__(self):
         return len(self.loc_ids)
-    
+
 
     ###### WHAT THE HELL IS THIS THING DOING ######
     # it needs to report:
-    # - 
-    # - 
+    # -
+    # -
 
 
 def test():
     test_bc_path = Path(__file__).parent / "data" / "testing" / "ebird_L109516__1900_2021_1_12_barchart.txt/"
     test_bc = Barchart.new_from_csv(test_bc_path)
-    
+
 
 
 if __name__ == "__main__":

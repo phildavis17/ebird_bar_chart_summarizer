@@ -11,7 +11,7 @@ A suite of tools for working with eBird histogram data.
 There are three main use cases, but this isn't a complete list of everything it could be used for.
 
 ### Preparing for Travel
-Work trip to Seattle? Summarize a few hotspots in the city around the date of your trip to get a quick understanding of what birds people see there. 
+Work trip to Seattle? Summarize a few hotspots in the city around the date of your trip to get a quick understanding of what birds people see there.
 
 Week-long birding trip to Costa Rica? Look at all the hotspots you'll be visiting in a single glance, and find out which spicies you're likely to encounter over the course of the whole trip.
 

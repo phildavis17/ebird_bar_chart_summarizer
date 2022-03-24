@@ -23,5 +23,4 @@ The CLI can collect barchart files, read their filenames and contents, and use t
  - identify ebird Batcharts
  - read them all and pass their info to Barchart objects
  - construct a Summary object from those barcharts.
- - 
- 
+ -
