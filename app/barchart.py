@@ -161,7 +161,6 @@ class Summarizer:
             summary_dict[hs] = hs_summary
         return summary_dict
 
-
     @staticmethod
     def _build_period_range(start: int, end: int):
         """Takes a start and end period, and creates a list of integers included in that range. Range includes bounds."""
@@ -221,7 +220,6 @@ class Summarizer:
             inverse_overall *= 1 - odds
         return 1 - inverse_overall
 
-    
     def find_current_specialties(self, include_sub_species: bool = False) -> dict:
         pass
 
