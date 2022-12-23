@@ -6,4 +6,3 @@ from app.summary import Summarizer
 def test_extant():
     empty = Summarizer()
     assert empty is not None
-

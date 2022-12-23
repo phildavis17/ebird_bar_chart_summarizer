@@ -1,4 +1,3 @@
-from re import S
 import pytest
 
 from app.barchart import Barchart, Summarizer
@@ -63,7 +62,7 @@ def sample_summarizer() -> "Summarizer":
     mp_bc_path = Path(__file__).parent / "test_data" / "ebird_L385839__1900_2021_1_12_barchart.txt/"
     bc_list = [pp_bc_path, cv_bc_path, mp_bc_path]
     return Summarizer([Barchart.new_from_csv(bc_file) for bc_file in bc_list], name = "Sample Summarizer")
-    
+
 
 def test_extant(sample_barchart):
     """Tests that a barchart object has actually been created."""
@@ -82,7 +81,7 @@ def test_ingest_filename(sample_barchart: "Barchart"):
 def test_get_hotspot_name(sample_barchart: "Barchart"):
     """
     Tests that the hotspot's name has been properly collected.
-    
+
     NOTE: the method that does this is cached, so this either
     tests that the cache is working, or it will ping eBird,
     which will be painfully slow.
@@ -115,7 +114,6 @@ def test_ingest_file_data_medium(sample_barchart: "Barchart"):
     assert len(sample_barchart.observations["Snow Goose"]) == 48
     assert len(sample_barchart.observations["bird sp."]) == 48
     assert len(sample_barchart.observations["Fake Bird"]) == 48
-    
 
 
 def test_ingest_file_data_fine(sample_barchart: "Barchart"):
@@ -242,17 +240,37 @@ def test_overall_odds_simple(sample_summarizer: "Summarizer"):
     assert sample_summarizer._overall_odds([0, 1]) == 1
 
 
-def test_summary_dict_whole_year(sample_summarizer: "Summarizer"):
-    whole_year = sample_summarizer.build_summary_dict(list(range(48)), True)
-    assert whole_year["L109516"]["Snow Goose"] == 0.02331
-    assert whole_year["L351189"]["Snow Goose"] == 0.01102
-    assert whole_year["L385839"]["Snow Goose"] == 0.02163
-    assert whole_year["L109516"]["Magnolia Warbler"] == 0.19184
-    assert whole_year["L351189"]["Magnolia Warbler"] == 0.08875
-    assert whole_year["L385839"]["Magnolia Warbler"] == 0.02338
-    assert whole_year["L109516"]["Northern Cardinal"] == 0.77615
-    assert whole_year["L351189"]["Northern Cardinal"] == 0.58411
-    assert whole_year["L385839"]["Northern Cardinal"] == 0.50819
+@pytest.fixture
+def whole_year_summary(sample_summarizer: "Summarizer") -> dict:
+    return sample_summarizer.build_summary_dict(list(range(48)))
+
+
+@pytest.fixture
+def migration_summary(sample_summarizer: "Summarizer") -> dict:
+    return sample_summarizer.build_summary_dict(list(range(12, 20)))
+
+
+@pytest.fixture
+def summer_summary(sample_summarizer: "Summarizer") -> dict:
+    return sample_summarizer.build_summary_dict(list(range(24, 32)))
+
+
+@pytest.fixture
+def winter_summary(sample_summarizer: "Summarizer") -> dict:
+    return sample_summarizer.build_summary_dict([46, 47, 0, 1])
+
+
+def test_summary_dict_whole_year(whole_year_summary: dict):
+    assert whole_year_summary["L109516"]["Snow Goose"] == 0.02331
+    assert whole_year_summary["L351189"]["Snow Goose"] == 0.01102
+    assert whole_year_summary["L385839"]["Snow Goose"] == 0.02163
+    assert whole_year_summary["L109516"]["Magnolia Warbler"] == 0.19184
+    assert whole_year_summary["L351189"]["Magnolia Warbler"] == 0.08875
+    assert whole_year_summary["L385839"]["Magnolia Warbler"] == 0.02338
+    assert whole_year_summary["L109516"]["Northern Cardinal"] == 0.77615
+    assert whole_year_summary["L351189"]["Northern Cardinal"] == 0.58411
+    assert whole_year_summary["L385839"]["Northern Cardinal"] == 0.50819
+
 
 def test_summary_dict_migration(sample_summarizer: "Summarizer"):
     migration = sample_summarizer.build_summary_dict(list(range(12, 20)), True)
@@ -265,4 +283,36 @@ def test_summary_dict_migration(sample_summarizer: "Summarizer"):
     assert migration["L109516"]["Northern Cardinal"] == 0.83663
     assert migration["L351189"]["Northern Cardinal"] == 0.64010
     assert migration["L385839"]["Northern Cardinal"] == 0.66500
-    
+
+
+def test_summary_dict_summer(sample_summarizer: "Summarizer"):
+    summer = sample_summarizer.build_summary_dict(list(range(24, 32)), True)
+    assert summer["L109516"]["Snow Goose"] == 0.0
+    assert summer["L351189"]["Snow Goose"] == 0.0
+    assert summer["L385839"]["Snow Goose"] == 0.0
+    assert summer["L109516"]["Magnolia Warbler"] == 0.16166
+    assert summer["L351189"]["Magnolia Warbler"] == 0.06132
+    assert summer["L385839"]["Magnolia Warbler"] == 0.00672
+    assert summer["L109516"]["Northern Cardinal"] == 0.72812
+    assert summer["L351189"]["Northern Cardinal"] == 0.66981
+    assert summer["L385839"]["Northern Cardinal"] == 0.50252
+
+
+def test_summary_dict_winter(winter_summary: dict):
+    assert winter_summary["L109516"]["Snow Goose"] == 0.06125
+    assert winter_summary["L351189"]["Snow Goose"] == 0.06140
+    assert winter_summary["L385839"]["Snow Goose"] == 0.08358
+    assert winter_summary["L109516"]["Magnolia Warbler"] == 0.0
+    assert winter_summary["L351189"]["Magnolia Warbler"] == 0.0
+    assert winter_summary["L385839"]["Magnolia Warbler"] == 0.0
+    assert winter_summary["L109516"]["Northern Cardinal"] == 0.75564
+    assert winter_summary["L351189"]["Northern Cardinal"] == 0.37719
+    assert winter_summary["L385839"]["Northern Cardinal"] == 0.43582
+
+def test_dynamic_summary(sample_summarizer: "Summarizer"):
+    """Makes sure the overall odds for a species changes when a hotspot is turned off."""
+    all_parks = sample_summarizer.build_summary_dict(list(range(48)))
+    sample_summarizer.set_hotspot_inactive("L109516")
+    no_pp = sample_summarizer.build_summary_dict(list(range(48)))
+    assert sample_summarizer._overall_odds([hs_dict["Snow Goose"] for hs_dict in all_parks.values()]) == 0.05497
+    assert sample_summarizer._overall_odds([hs_dict["Snow Goose"] for hs_dict in no_pp.values()]) == 0.03241

@@ -22,7 +22,7 @@ class Summarizer:
     @staticmethod
     def _collect_hotspot_names(loc_ids: tuple) -> tuple:
         return tuple([ebird_interface.hotspot_name_from_loc_id(loc_id) for loc_id in loc_ids])
-    
+
     def simulate(self, active_hotspots: Optional[set] = None):
         """Generates a simulated outcome of a trip using the current hotspots."""
         pass

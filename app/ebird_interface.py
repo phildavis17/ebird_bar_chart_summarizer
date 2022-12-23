@@ -37,7 +37,7 @@ def test():
     ]
     for loc in test_loc_ids:
         print(hotspot_name_from_loc_id(loc))
-    
+
     print(len(TAXONOMIC_INDEX_DICT))
 
 if __name__ == "__main__":
